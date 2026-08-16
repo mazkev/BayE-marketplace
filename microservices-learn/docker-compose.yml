@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  # 1. MESSAGE BROKER CONTAINER (RabbitMQ + Web Management Dashboard)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: baye-rabbitmq
+    ports:
+      - "5672:5672"     # Port AMQP untuk pengiriman pesan dari kode aplikasi
+      - "15672:15672"   # Port Dashboard Visual RabbitMQ (http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. MICROSERVICE BACKEND WORKER CONTAINER
+  notification-backend:
+    build: .
+    container_name: baye-notification-service
+    ports:
+      - "4000:4000"     # Port API Backend
+    environment:
+      PORT: 4000
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
