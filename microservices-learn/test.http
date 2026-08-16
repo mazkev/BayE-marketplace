@@ -1,0 +1,64 @@
+### =======================================================
+### 🧪 TEST SUITE: MICROSERVICES & RABBITMQ (REST Client)
+### =======================================================
+
+### 1. Periksa Status Kesehatan Server Microservice
+# Tekan "Send Request" di bawah ini:
+GET http://localhost:4000/
+
+###
+
+### 2. Kirim Event "OrderCreated" ke RabbitMQ (Simulasi Checkout Pesanan)
+# Saat dikirim, Worker akan menangkap event dan mencetak log WhatsApp & Email:
+POST http://localhost:4000/publish
+Content-Type: application/json
+
+{
+  "event": "OrderCreated",
+  "orderId": "ORD-7890",
+  "recipient": "Budi Santoso",
+  "phone": "081234567890",
+  "email": "budi.santoso@example.com",
+  "product": "Aura ANC Studio Wireless Headphones",
+  "totalAmount": 1690000,
+  "timestamp": "2026-08-16T16:00:00Z"
+}
+
+###
+
+### 3. Kirim Event "FlashSalePromo" ke RabbitMQ (Simulasi Broadcast Promo)
+POST http://localhost:4000/publish
+Content-Type: application/json
+
+{
+  "event": "FlashSalePromo",
+  "campaign": "Super Weekend Tech Fest 2026",
+  "discount": "40%",
+  "couponCode": "BAYE10",
+  "recipient": "Semua Member BayE",
+  "phone": "085711223344",
+  "email": "member@baye.id"
+}
+
+###
+
+### 4. Kirim Event Custom Suka-Suka (Testing Bebas)
+POST http://localhost:4000/publish
+Content-Type: application/json
+
+{
+  "event": "UserRegistered",
+  "userName": "Kevin Pratama (mazkev)",
+  "role": "SELLER",
+  "email": "kevin@baye.id",
+  "storeName": "Apex Gear Official Store"
+}
+
+###
+
+### =======================================================
+### 🛍️ BONUS: TEST API SEARCH UTAMA BAYE (Port 3000)
+### =======================================================
+
+### 5. Test Live Search API BayE Marketplace
+GET http://localhost:3000/api/search?q=keyboard
